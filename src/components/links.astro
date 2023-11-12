@@ -1,0 +1,51 @@
+---
+import { Icon } from "astro-icon";
+const LinkArray = [
+    {
+        icon: "bxl:github",
+        link: "https://github.com/ArmoLab",
+        desc: "ArmoLab"
+    },
+    {
+        icon: "bxl:telegram",
+        link: "https://t.me/ArmoLab",
+        desc: "ArmoLab"
+    }
+]
+---
+<div>
+    {LinkArray.map((i) => (
+        <a class="link-item" href={i.link}>
+            <span class="icon">
+                <Icon name={i.icon} />
+            </span>
+            <span class="desc">{i.desc}</span>
+        </a>
+    ))}
+</div>
+
+<style lang="scss">
+    .link-item {
+        display: inline-flex;
+        align-items: center;
+        font-size: large;
+        background-color: #404040;
+        padding: 6px 8px;
+        padding-right: 12px;
+        border-radius: 50px;
+        .icon {
+            border-right-color: #909090;
+            border-right-width: 1px;
+            border-right-style: solid;
+            padding-right: 6px;
+            margin-right: 6px;
+        }
+        &:not(:last-child) {
+            margin-right: 10px;
+        }
+        &::after {
+            content: none;
+            display: none;
+        }
+    }
+</style>

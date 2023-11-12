@@ -1,0 +1,45 @@
+---
+---
+<p>/* <span id="typer"></span> */</p>
+<script>
+    const textList = [
+        "Welcome to the Armo Laboratory.",
+        "我们生活在阴沟里，但有人依然仰望星空。",
+        "We live in the gutter, but some still gaze at the stars."
+    ];
+    
+    let textIndex = 0;
+    let i = 0;
+    
+    function backspace() {
+        if(i > 0) {
+            i--;
+            document.getElementById("typer").innerHTML = textList[textIndex].substring(0, i);
+            setTimeout(backspace, 25);
+        } else {
+            textIndex++;
+            setTimeout(typeWriter, 300); 
+        }
+    }
+    function typeWriter() {
+        if (textIndex >= textList.length) {
+            textIndex = 0;
+        }
+
+        let currentText = textList[textIndex];
+    
+        if (i < currentText.length) {
+            document.getElementById("typer").innerHTML += currentText.charAt(i);
+            i++;
+            setTimeout(typeWriter, 50);
+        } else {
+            if(textIndex < textList.length) {
+                setTimeout(function () {
+                    backspace()
+                }, 2500); 
+            }
+        }
+    }
+    
+    typeWriter();
+</script>

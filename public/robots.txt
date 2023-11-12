@@ -1,0 +1,14 @@
+User-agent: *
+Disallow: /assets/
+Disallow: /static/
+Disallow: /*.png$
+Disallow: /*.jpg$
+Disallow: /*.webp$
+Disallow: /*.js$
+Disallow: /*.css$
+Disallow: /404.html
+Disallow: /admin.html
+Disallow: /block-img.html
+Disallow: /whitelist-on.html
+Crawl-delay: 60
+Allow:/
