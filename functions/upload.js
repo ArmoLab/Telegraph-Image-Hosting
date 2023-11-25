@@ -16,11 +16,20 @@ export async function onRequestPost (context) {
     });
 }
 export async function onRequestOptions (context) {
+    const url = new URL(context.request.url);
     return new Response("OK", {
         status: 200,
-        headers: {
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": "POST, OPTIONS"
-        }
+        headers: (
+            `${url.hostname}:${url.port}` === "localhost:8788"
+                ? {
+                    //"Access-Control-Allow-Origin":  "localhost:4321")
+                    "Access-Control-Allow-Origin":  "http://localhost:4321",
+                    "Access-Control-Allow-Credentials": "true",
+                    "Access-Control-Allow-Methods": "POST, OPTIONS"
+                } : {
+                    "Access-Control-Allow-Origin": (`${url.hostname}:${url.port}` === "localhost:4321" && "*"),
+                    "Access-Control-Allow-Methods": "POST, OPTIONS"
+                }
+        )
     });
 }

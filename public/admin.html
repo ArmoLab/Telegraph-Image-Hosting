@@ -58,10 +58,10 @@
             <el-table-column label="preview" prop="preview">
               <template slot-scope="scope">
                 <video v-if="scope.row.name.indexOf('.mp4')>0" style="width: 100%; height: 100%;" controls>
-                  <source :src="'/file/'+scope.row.name" type="video/mp4">
+                  <source :src="scope.row.url" type="video/mp4">
                 </video>
-                <el-image v-else style="width: 100%; height: 100%;" :src="'/file/'+scope.row.name" :zoom-rate="1.2"
-                  :preview-src-list="['/file/'+scope.row.name]" fit="cover" lazy />
+                <el-image v-else style="width: 100%; height: 100%;" :src="scope.row.url" :zoom-rate="1.2"
+                  :preview-src-list="[scope.row.url]" fit="cover" lazy />
 
               </template>
             </el-table-column>
@@ -98,6 +98,16 @@
 <script src="https://cdn.jsdelivr.net/npm/element-ui@2.15.3/lib/index.js"
   integrity="sha256-OFVFYfqhQ9nDnKh+NfIsefpy/fnjTwkK909ZYgo45nw=" crossorigin="anonymous"></script>
 <script>
+
+  function alert (text) {
+    console.warn(text)
+  }
+  	let BackendAPI = 
+		location.hostname === "localhost"
+			? "http://localhost:8788"
+			: `https://${location.hostname}${location.port}`;
+
+  
   var app = new Vue({
     el: '#app',
     data: {
@@ -127,7 +137,7 @@
             credentials: 'include'
           };
 
-          fetch("./api/manage/block/" + key, requestOptions)
+          fetch(`${BackendAPI}/api/manage/block/${key}`, requestOptions)
             .then(response => response.text())
             .then(result => {
               console.log(result);
@@ -150,7 +160,7 @@
             credentials: 'include'
           };
 
-          fetch("./api/manage/delete/" + key, requestOptions)
+          fetch(`${BackendAPI}/api/manage/delete/` + key, requestOptions)
             .then(response => response.text())
             .then(result => { console.log(result); this.tableData.remove(index); })
             .catch(error => { alert("An error occurred while synchronizing data with the server, please check the network connection"); console.log('error', error) });
@@ -169,7 +179,7 @@
             //include authorization credientials
             credentials: 'include'
           };
-          fetch("./api/manage/white/" + key, requestOptions)
+          fetch(`${BackendAPI}/api/manage/white/` + key, requestOptions)
             .then(response => response.text())
             .then(result => { console.log(result); this.tableData[index].metadata = result; })
             .catch(error => { alert("An error occurred while synchronizing data with the server, please check the network connection"); console.log('error', error) });
@@ -180,7 +190,7 @@
 
       },
       handleLogout() {
-        window.location.href = "./api/manage/logout";
+        window.location.href = `${BackendAPI}/api/manage/logout`;
       }
     },
 
@@ -193,7 +203,7 @@
         //include authorization credientials
         credentials: 'include'
       };
-      fetch("./api/manage/check", requestOptions)
+      fetch(`${BackendAPI}/api/manage/check`, requestOptions)
         .then(response => response.text())
         .then(result => {
           console.log(result);
@@ -203,7 +213,7 @@
 
           }
           else {
-            window.location.href = "./api/manage/login";
+            window.location.href = `${BackendAPI}/api/manage/login`;
           }
         })
         .catch(error => { alert("An error occurred while synchronizing data with the server, please check the network connection"); console.log('error', error) });
@@ -224,41 +234,32 @@
       };
 
 
-      fetch("./api/manage/list", requestOptions)
+      fetch(`${BackendAPI}/api/manage/list`, requestOptions)
         //判断是否需要登录
         .then(response => {
           if (response.status == 401) {
             alert("请先登录");
-            window.location.href = "./api/manage/login";
+            window.location.href = `${BackendAPI}/api/manage/login`;
           }
           else {
             return response;
           }
         })
-        .then(response => response.text())
-        .then(result => { this.tableData = JSON.parse(result); console.log(result); this.Number = this.tableData.length })
+        .then(response => response.json())
+        .then(result => { 
+
+          for (let i=0; i<result.length; i++) {
+            result[i].url = `${BackendAPI}/file/${result[i].name}`
+          }
+          console.log(result)
+          this.tableData = result;
+          this.Number = this.tableData.length
+        })
         .catch(error => { alert("An error occurred while synchronizing data with the server, please check the network connection"); console.log('error', error) });
 
     }
   })
 
-</script><!-- Hotjar Tracking Code -->
-<script>
-    (function (h, o, t, j, a, r) {
-      h.hj = h.hj || function () { (h.hj.q = h.hj.q || []).push(arguments) };
-      h._hjSettings = { hjid: 2531461, hjsv: 6 };
-      a = o.getElementsByTagName('head')[0];
-      r = o.createElement('script'); r.async = 1;
-      r.src = t + h._hjSettings.hjid + j + h._hjSettings.hjsv;
-      a.appendChild(r);
-    })(window, document, 'https://static.hotjar.com/c/hotjar-', '.js?sv=');
-</script>
-<script type="text/javascript">
-  (function (c, l, a, r, i, t, y) {
-    c[a] = c[a] || function () { (c[a].q = c[a].q || []).push(arguments) };
-    t = l.createElement(r); t.async = 1; t.src = "https://www.clarity.ms/tag/" + i;
-    y = l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t, y);
-  })(window, document, "clarity", "script", "7t5ai7agat");
 </script>
 
 </html>
