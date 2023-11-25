@@ -1,10 +1,13 @@
 name = "telegraph-image-hosting"
 compatibility_date = "2023-10-10"
 
-[site]
-bucket = "./"
+main = "workers-site/index.js"
 
 vars.BASIC_USER = "admin"
 vars.BASIC_PASS = "admin12345678"
 vars.ModerateContentApiKey = ""
+
+kv_namespaces = [
+    { binding = "img_url", id = "ce9865c0f4bf49d9858be1dbccc9e2c5" }
+]
 
