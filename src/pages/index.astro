@@ -41,11 +41,11 @@ import Layout from "@layouts/main.astro";
 					<code class="file-url">请先上传文件。</code>
 				</div>
 				<div class="actions">
-					<button onclick="UploadByUUID(this.parentElement.parentElement.getAttribute('UUID'));">
+					<button data-action="upload">
 						<Icon name="heroicons:arrow-up-tray" />
 						<span class="tip">Upload</span>
 					</button>
-					<button onclick="RemoveByUUID(this.parentElement.parentElement);">
+					<button data-action="remove">
 						<Icon name="heroicons:x-circle" />
 						<span class="tip">Cancel</span>
 					</button>
@@ -205,153 +205,4 @@ import Layout from "@layouts/main.astro";
 	}
 </style>
 
-<script lang="javascript">
-	/* @ts-ignore */
-	window.FileArr = {};
-	let BackendAPI = 
-		location.hostname === "localhost"
-			? "http://localhost:8788"
-			: `https://${location.hostname}${location.port}`;
-
-	const DropArea = document.getElementById("drop-area");
-
-	window.RemoveByUUID = function (Element) {
-		let UUID = Element.getAttribute("UUID");
-		delete FileReader[UUID];
-		try {
-			Element.remove()
-		} catch (err) {
-			Element.innerHTML = "";
-			Element.style.display = "none";
-		}
-	}
-	window.UploadByUUID = function (UUID) {
-		console.log(FileArr[UUID])
-		let TargetEl = document.querySelector(`div[uuid="${UUID}"]`);
-		TargetEl.querySelector(".file-progress").innerText = "0%"
-		TargetEl.querySelector(".progress").style.width = "0%"
-
-		const form = new FormData()
-		form.append(
-			"photo", 
-			FileArr[UUID]
-		)
-
-		let xhr = new XMLHttpRequest();
-		xhr.open("POST", `${BackendAPI}/upload`);
-
-
-		xhr.upload.addEventListener("progress", (event) => {
-			let Progress = ( (event.loaded / event.total) * 100 ).toFixed(2) + "%"
-      		console.log(`Uploading (${Progress})...`);
-			TargetEl.querySelector(".file-progress").innerText = Progress;
-			TargetEl.querySelector(".progress").style.width = Progress;
-			if (Progress === "100.00%") {
-				TargetEl.querySelector(".file-progress").innerText = "Processing";
-				return;
-			}
-    	});
-
-		xhr.addEventListener("load", function () {
-			TargetEl.querySelector(".file-progress").innerText = "Done"
-			TargetEl.querySelector("code.file-url").innerText = `${BackendAPI}${JSON.parse(this.response)[0].src}`
-		})
-
-  		xhr.send(form);
-	}
-	function toReadableSize (bytes) {
-  		const units = ["B", "KiB", "MiB", "GiB", "TiB", "PiB", "EiB", "ZiB", "YiB"];
-  		let i = 0;
-  		while (bytes >= 1024 && i < units.length - 1) {
-    		bytes /= 1024;
-    		i++;
-  		}
-  		return `${bytes.toFixed(2)} ${units[i]}`;
-	}
-	function uuidv4() {
-		function to16ByteStr (Start, End) {
-			return `${Bytes.slice(Start, End).toString().replace(/,/gi, "")}`
-		}
-  		let Bytes = function () {
-			let units = new Uint8Array(20);
-  			crypto.getRandomValues(units);
-			let BytesArray = [];
-			for (let i in units) {
-				BytesArray.push(units[i].toString(16).padStart(2, "0"));
-			}
-			return BytesArray;
-		}()
-  		return `${to16ByteStr(0, 4)}-${to16ByteStr(5, 7)}-${to16ByteStr(8, 10)}-${to16ByteStr(11, 13)}-${to16ByteStr(14, 20)}`;
-	}
-
-	function appendFilePreview (files) {
-		for (let file of files) {
-				const { name, size } = file;
-				console.log(toReadableSize(size))
-				let FileUUID = uuidv4();
-				window.FileArr[FileUUID] = file;
-
-				let FilePreviewEl = document.querySelector("#FilesPreview .file.prototype").cloneNode(true);
-				FilePreviewEl.classList.remove("prototype")
-				FilePreviewEl.setAttribute("UUID", FileUUID)
-				FilePreviewEl.querySelector(".file-name").innerText = name;
-				FilePreviewEl.querySelector(".file-size").innerText = toReadableSize(size);
-				FilePreviewEl.querySelector(".file-progress").innerText = "0%";
-				FilePreviewEl.querySelector(".progress").style.width = "0%";
-
-				document.querySelector("#FilesPreview").appendChild(FilePreviewEl);
-			}
-	}
-
-
-	function handleEvent(event) {
-		// 阻止事件的默认行为
-		event.preventDefault();
-		if (event.type === "drop") {
-			// 文件进入并松开鼠标,文件边框恢复正常
-			DropArea.classList.remove("active")
-			appendFilePreview(event.dataTransfer.files);
-		} else if (event.type === "dragleave") {
-			// out
-			DropArea.classList.remove("active")
-		} else {
-			//in
-			DropArea.classList.add("active")
-		}
-	}
-	// 拖拽事件绑定
-	DropArea.addEventListener("dragenter", handleEvent);
-	DropArea.addEventListener("dragover", handleEvent);
-	DropArea.addEventListener("drop", handleEvent);
-	DropArea.addEventListener("dragleave", handleEvent);
-
-
-
-	let FileChooser = document.querySelector("input#file-chooser");
-	FileChooser.addEventListener("change", async function () {
-		console.log(this.files)
-
-		appendFilePreview(this.files);
-	})
-
-	async function Upload (File) {
-		const form = new FormData()
-		form.append(
-			"photo", 
-			File
-		)
-		let Respond = await fetch(`${BackendAPI}/upload`, {
-    		method: "POST",
-    		body: form
-  		})
-    	.then(result => result.json())
-    	.then((result) => {
-      		if (result.error) {
-        		throw result.error
-			}
-			return result
-      	})
-		console.log(Respond)
-	}
-	
-</script>
+<script src="@assets/js/main.js"></script>
