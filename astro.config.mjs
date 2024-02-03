@@ -1,7 +1,8 @@
 import { defineConfig } from "astro/config";
-import sitemap from "@astrojs/sitemap";
 import fs from "node:fs";
+import sitemap from "@astrojs/sitemap";
 import compress from "astro-compress";
+import icon from "astro-icon";
 
 const domain = JSON.parse(fs.readFileSync("./package.json")).homepage;
 const CurrentDir = process.cwd();
@@ -17,6 +18,7 @@ export default defineConfig({
       Exclude: [
         (File) => File.startsWith(`${CurrentDir}/dist/functions/`)
       ],
-    })
+    }),
+    icon()
   ]
 });

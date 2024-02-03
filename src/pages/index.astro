@@ -1,5 +1,5 @@
 ---
-import { Icon } from "astro-icon";
+import { Icon } from "astro-icon/components";
 import Layout from "@layouts/main.astro";
 ---
 <Layout>
@@ -125,7 +125,7 @@ import Layout from "@layouts/main.astro";
 						button {
 							padding: 10px 14px;
 							margin-top: 10px;
-							[astro-icon] {
+							[data-icon] {
 								width: 22px;
 								height: 22px;
 								vertical-align: -0.3125rem;
@@ -197,7 +197,7 @@ import Layout from "@layouts/main.astro";
 					display: none;
 				}
 			}
-			[astro-icon] {
+			[data-icon] {
 				height: 32px;
     			width: 32px;
 			}
